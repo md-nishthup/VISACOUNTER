@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VISACOUNTER - F4 Visa Statistics</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">
+                    <i class="fas fa-passport"></i>
+                    VISACOUNTER
+                </h1>
+                <nav class="nav">
+                    <button id="adminBtn" class="btn btn-admin">
+                        <i class="fas fa-cog"></i> Admin Panel
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero">
+                <h2>F4 Visa Statistics Dashboard</h2>
+                <p class="hero-subtitle">Family-sponsored Visa Issuances (October 2024 - September 2025)</p>
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalVisas">0</div>
+                        <div class="stat-label">Total Visas Issued</div>
+                    </div>
+                    <div class="stat-card highlight">
+                        <div class="stat-number">65,000</div>
+                        <div class="stat-label">Annual Visa Limit</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="remainingVisas">65,000</div>
+                        <div class="stat-label">Remaining Visas</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Monthly Totals Section -->
+            <section class="section">
+                <h3><i class="fas fa-calendar-alt"></i> Monthly Visa Issuances</h3>
+                <div class="table-container">
+                    <table class="data-table" id="monthlyTable">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Visas Issued</th>
+                                <th>Percentage of Annual Limit</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monthlyTableBody">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="total-row">
+                                <td><strong>Total</strong></td>
+                                <td><strong id="monthlyTotal">0</strong></td>
+                                <td><strong id="monthlyPercentage">0%</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Country-wise Statistics Section -->
+            <section class="section">
+                <h3><i class="fas fa-globe"></i> Country-wise Visa Issuances</h3>
+                <div class="controls-container">
+                    <div class="month-selector">
+                        <label for="monthSelect"><i class="fas fa-calendar"></i> Select Month:</label>
+                        <select id="monthSelect" class="month-dropdown">
+                            <option value="October 2024">October 2024</option>
+                            <option value="November 2024">November 2024</option>
+                            <option value="December 2024">December 2024</option>
+                            <option value="January 2025">January 2025</option>
+                            <option value="February 2025">February 2025</option>
+                            <option value="March 2025">March 2025</option>
+                            <option value="April 2025">April 2025</option>
+                            <option value="May 2025">May 2025</option>
+                        </select>
+                    </div>
+                    <div class="search-container">
+                        <input type="text" id="countrySearch" placeholder="Search countries..." class="search-input">
+                        <i class="fas fa-search search-icon"></i>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="countryTable">
+                        <thead>
+                            <tr>
+                                <th>Country</th>
+                                <th>Visas Issued</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody id="countryTableBody">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                        <tfoot>
+                            <tr class="total-row">
+                                <td><strong>Total</strong></td>
+                                <td><strong id="countryTotal">0</strong></td>
+                                <td><strong>100%</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Social Media Section -->
+            <section class="social-section">
+                <h3><i class="fas fa-share-alt"></i> Connect with Us</h3>
+                <div class="social-links">
+                    <a href="https://www.facebook.com/share/g/175MdiQUQB/" target="_blank" class="social-link facebook">
+                        <i class="fab fa-facebook-f"></i>
+                        <span>Join our Facebook Group</span>
+                    </a>
+                    <a href="https://www.facebook.com/share/p/1GFuuoS14C/" target="_blank" class="social-link facebook">
+                        <i class="fab fa-facebook"></i>
+                        <span>Follow our Facebook Page</span>
+                    </a>
+                    <a href="https://www.youtube.com/@Scifinovation-566" target="_blank" class="social-link youtube">
+                        <i class="fab fa-youtube"></i>
+                        <span>Subscribe to our YouTube Channel</span>
+                    </a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal" class="modal">
+        <div class="modal-content admin-login">
+            <div class="modal-header">
+                <h3><i class="fas fa-lock"></i> Admin Authentication</h3>
+                <button class="close-btn" id="closeAdminLogin">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="adminLoginForm" class="admin-form">
+                    <div class="form-group">
+                        <label for="adminId">Admin ID:</label>
+                        <input type="text" id="adminId" placeholder="Enter Admin ID" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPassword">Password:</label>
+                        <input type="password" id="adminPassword" placeholder="Enter Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </form>
+                <div class="demo-credentials">
+                    <p><small><i class="fas fa-info-circle"></i> Demo Credentials:</small></p>
+                    <p><small>ID: <code>admin</code> | Password: <code>visa2025</code></small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel Modal -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content admin-panel">
+            <div class="modal-header">
+                <h3><i class="fas fa-cog"></i> Admin Dashboard</h3>
+                <div class="admin-header-actions">
+                    <span class="admin-user"><i class="fas fa-user"></i> Welcome, Admin</span>
+                    <button class="btn btn-secondary" id="logoutBtn">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                    <button class="close-btn" id="closeAdmin">&times;</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <!-- Admin Options -->
+                <div class="admin-options">
+                    <button class="admin-option-btn" id="addNewTableBtn">
+                        <i class="fas fa-plus-circle"></i>
+                        <div>
+                            <h4>Add New Table</h4>
+                            <p>Create country-wise visa data for a new month</p>
+                        </div>
+                    </button>
+                    <button class="admin-option-btn" id="updateExistingBtn">
+                        <i class="fas fa-edit"></i>
+                        <div>
+                            <h4>Update Existing Table</h4>
+                            <p>Modify monthly totals and existing data</p>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Add New Table Section -->
+                <div id="addNewTableSection" class="admin-section" style="display: none;">
+                    <div class="section-header">
+                        <h4><i class="fas fa-table"></i> Add New Country Table</h4>
+                        <button class="btn btn-secondary" id="backToOptions1">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                    </div>
+                    
+                    <div class="new-table-form">
+                        <div class="form-group">
+                            <label for="newTableMonth">Month:</label>
+                            <input type="text" id="newTableMonth" placeholder="e.g., June 2025" required>
+                        </div>
+                        
+                        <div class="table-builder">
+                            <h5>Country Data Entry</h5>
+                            <div class="table-container">
+                                <table class="data-table" id="newCountryTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Country</th>
+                                            <th>Visas Issued</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="newCountryTableBody">
+                                        <!-- Dynamic rows will be added here -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="table-actions">
+                                <button class="btn btn-success" id="addNewRowBtn">
+                                    <i class="fas fa-plus"></i> Add Row
+                                </button>
+                                <button class="btn btn-primary" id="saveNewTableBtn">
+                                    <i class="fas fa-save"></i> Save Table
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Update Existing Section -->
+                <div id="updateExistingSection" class="admin-section" style="display: none;">
+                    <div class="section-header">
+                        <h4><i class="fas fa-edit"></i> Update Existing Data</h4>
+                        <button class="btn btn-secondary" id="backToOptions2">
+                            <i class="fas fa-arrow-left"></i> Back
+                        </button>
+                    </div>
+                    
+                    <div class="admin-tabs">
+                        <button class="tab-btn active" data-tab="monthly">Monthly Totals</button>
+                        <button class="tab-btn" data-tab="country">Country Data</button>
+                    </div>
+                    
+                    <div id="monthlyTab" class="tab-content active">
+                        <h5>Update Monthly Visa Totals</h5>
+                        <form id="monthlyForm" class="admin-form">
+                            <div class="form-group">
+                                <label for="monthInput">Month:</label>
+                                <input type="text" id="monthInput" placeholder="e.g., October 2024" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="visaCountInput">Visa Count:</label>
+                                <input type="number" id="visaCountInput" placeholder="e.g., 6151" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Update Data
+                            </button>
+                        </form>
+                        
+                        <!-- Current Monthly Data Display -->
+                        <div class="current-data">
+                            <h6>Current Monthly Data:</h6>
+                            <div class="monthly-data-list" id="monthlyDataList">
+                                <!-- Monthly data will be displayed here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="countryTab" class="tab-content">
+                        <h5>Update Country Visa Data</h5>
+                        <p class="current-month-info">Currently editing: <strong id="currentMonth">October 2024</strong></p>
+                        <form id="countryForm" class="admin-form">
+                            <div class="form-group">
+                                <label for="countryInput">Country:</label>
+                                <input type="text" id="countryInput" placeholder="e.g., Bangladesh" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="countryVisaInput">Visa Count:</label>
+                                <input type="number" id="countryVisaInput" placeholder="e.g., 621" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Update Data
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 VISACOUNTER. Data source: <a href="https://travel.state.gov/content/travel/en/legal/visa-law0/visa-statistics/immigrant-visa-statistics/monthly-immigrant-visa-issuances.html" target="_blank">U.S. Department of State</a></p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
