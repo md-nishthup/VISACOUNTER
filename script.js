@@ -10,6 +10,10 @@ let monthlyData = [
     { month: 'May 2025', visas: 3320 }
 ];
 
+// Chart variables
+let monthlyChart = null;
+let countryChart = null;
+
 // Country data organized by month (complete data from your text file)
 let countryDataByMonth = {
     'October 2024': [
@@ -209,6 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
     populateMonthSelector();
     updateDisplay();
     initializeAdmin();
+    initializeCharts();
 });
 
 function initializeElements() {
@@ -313,6 +318,11 @@ function updateDisplay() {
     updateCountryTable();
     updateTotalVisas();
     updateProgressBar();
+    
+    // Update charts
+    setTimeout(() => {
+        createCountryChart(); // Refresh country chart for new month
+    }, 100);
 }
 
 function updateMonthlyTable() {
@@ -374,9 +384,56 @@ function updateCountryTable() {
 function filterCountries() {
     if (!countrySearch || !countryTableBody) return;
     
-    const searchTerm = countrySearch.value.toLowerCase();
+    const searchTerm = countrySearch.value.toLowerCase().trim();
     const rows = countryTableBody.querySelectorAll('tr');
     
+    // Show/hide quota box based on search
+    const quotaInfo = document.getElementById('quota-info');
+    
+    if (searchTerm.length > 0) {
+        // Check if search matches any country
+        let matchedCountry = null;
+        const allCountryData = [];
+        
+        // Collect all country data across all months
+        Object.values(countryDataByMonth).forEach(monthData => {
+            monthData.forEach(item => {
+                const existingCountry = allCountryData.find(c => c.country.toLowerCase() === item.country.toLowerCase());
+                if (existingCountry) {
+                    existingCountry.totalVisas += item.visas;
+                } else {
+                    allCountryData.push({ country: item.country, totalVisas: item.visas });
+                }
+            });
+        });
+        
+        // Find exact match
+        matchedCountry = allCountryData.find(c => c.country.toLowerCase().includes(searchTerm));
+        
+        if (matchedCountry && quotaInfo) {
+            showQuotaBox(matchedCountry);
+            createCountryChart(searchTerm); // Update chart for searched country
+        } else if (quotaInfo) {
+            quotaInfo.innerHTML = `
+                <div class="quota-default-message">
+                    <i class="fas fa-info-circle"></i>
+                    <h3>No data found for "${searchTerm}"</h3>
+                    <p>Please check the country name spelling or try searching for another country.</p>
+                </div>
+            `;
+            createCountryChart(); // Reset to default chart
+        }
+    } else if (quotaInfo) {
+        quotaInfo.innerHTML = `
+            <div class="quota-default-message">
+                <i class="fas fa-search"></i>
+                <p>Search country to see available quota</p>
+            </div>
+        `;
+        createCountryChart(); // Reset to default chart
+    }
+    
+    // Filter table rows
     rows.forEach(row => {
         const countryName = row.cells[0].textContent.toLowerCase();
         if (countryName.includes(searchTerm)) {
@@ -385,6 +442,55 @@ function filterCountries() {
             row.style.display = 'none';
         }
     });
+}
+
+function showQuotaBox(countryData) {
+    const quotaInfo = document.getElementById('quota-info');
+    const annualQuotaLimit = Math.floor(65000 * 0.07); // 7% of 65,000 = 4,550
+    const quotaIssuedThisYear = countryData.totalVisas;
+    const remainingQuota = annualQuotaLimit - quotaIssuedThisYear;
+    const percentUsed = ((quotaIssuedThisYear / annualQuotaLimit) * 100).toFixed(1);
+    
+    // Status and color logic
+    let statusClass = 'green';
+    let statusMessage = '✅ Good availability ';
+    
+    if (remainingQuota < 0) {
+        // Exceeded quota
+        const exceeded = Math.abs(remainingQuota);
+        statusClass = 'red';
+        statusMessage = `❌ Quota exceeded by ${exceeded.toLocaleString()} visas - Very low chance`;
+    } else if (remainingQuota <= 100) {
+        // Very limited
+        statusClass = 'red';
+        statusMessage = '🚨 Critical - Very few visas remaining';
+    } else if (remainingQuota < 1000) {
+        // Limited availability
+        statusClass = 'yellow';
+        statusMessage = '⚠️ Caution - Limited availability';
+    }
+    
+    quotaInfo.innerHTML = `
+        <div class="quota-boxes">
+            <div class="stat-box quota-stat-box">
+                <div class="stat-number">${quotaIssuedThisYear.toLocaleString()}</div>
+                <div class="stat-label">Quota Issued This Year</div>
+            </div>
+            <div class="stat-box quota-stat-box">
+                <div class="stat-number">${annualQuotaLimit.toLocaleString()}</div>
+                <div class="stat-label">Annual Quota Limit (7%)</div>
+            </div>
+            <div class="stat-box quota-stat-box ${statusClass}">
+                <div class="stat-number">${remainingQuota >= 0 ? remainingQuota.toLocaleString() : '0'}</div>
+                <div class="stat-label">Remaining Quota</div>
+            </div>
+        </div>
+        <div class="quota-status-message ${statusClass}">
+            <strong>${countryData.country} F4 Visa Quota Status:</strong> ${statusMessage}
+            <br><small>Used: ${percentUsed}% of annual country quota</small>
+            ${remainingQuota < 0 ? `<br><small>⚠️ Exceeded by: ${Math.abs(remainingQuota).toLocaleString()} visas</small>` : ''}
+        </div>
+    `;
 }
 
 function updateTotalVisas() {
@@ -621,4 +727,175 @@ function showNotification(message, type = 'info') {
             notification.parentNode.removeChild(notification);
         }
     }, 3000);
+}
+
+// Chart Functions
+function initializeCharts() {
+    setTimeout(() => {
+        createMonthlyChart();
+        createCountryChart();
+    }, 100);
+}
+
+function createMonthlyChart() {
+    const ctx = document.getElementById('monthlyChart');
+    if (!ctx) return;
+    
+    // Destroy existing chart if it exists
+    if (monthlyChart) {
+        monthlyChart.destroy();
+    }
+    
+    const months = monthlyData.map(item => item.month);
+    const visas = monthlyData.map(item => item.visas);
+    
+    monthlyChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'Visas Issued',
+                data: visas,
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Visas'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Month'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createCountryChart(searchTerm = '') {
+    const ctx = document.getElementById('countryChart');
+    if (!ctx) return;
+    
+    // Destroy existing chart if it exists
+    if (countryChart) {
+        countryChart.destroy();
+    }
+    
+    if (searchTerm) {
+        // Show data for searched country across all months
+        const allCountryData = [];
+        Object.entries(countryDataByMonth).forEach(([month, monthData]) => {
+            const countryData = monthData.find(item => 
+                item.country.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            if (countryData) {
+                allCountryData.push({
+                    month: month,
+                    visas: countryData.visas
+                });
+            }
+        });
+        
+        if (allCountryData.length > 0) {
+            const months = allCountryData.map(item => item.month);
+            const visas = allCountryData.map(item => item.visas);
+            
+            countryChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: `${searchTerm} Monthly Visas`,
+                        data: visas,
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                        borderColor: '#667eea',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Visas'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Month'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    } else {
+        // Show top countries for current selected month
+        const selectedMonth = monthSelector?.value || 'October 2024';
+        const currentData = countryDataByMonth[selectedMonth] || [];
+        
+        // Get top 8 countries
+        const topCountries = currentData
+            .sort((a, b) => b.visas - a.visas)
+            .slice(0, 8);
+        
+        const countries = topCountries.map(item => item.country);
+        const visas = topCountries.map(item => item.visas);
+        const colors = [
+            '#667eea', '#f093fb', '#f5576c', '#4facfe', '#43e97b',
+            '#fa709a', '#feca57', '#48dbfb'
+        ];
+        
+        countryChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: countries,
+                datasets: [{
+                    data: visas,
+                    backgroundColor: colors,
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right'
+                    }
+                }
+            }
+        });
+    }
 }

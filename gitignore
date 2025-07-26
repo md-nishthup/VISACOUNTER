@@ -1,0 +1,122 @@
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor and IDE Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node.js (if you add build tools later)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build directories
+build/
+dist/
+
+# Backup files
+*.bak
+*.backup
+*.tmp
+*.temp
+
+# Development files
+dev/
+development/
+test/
+testing/
+
+# Documentation build
+docs/_build/
+
+# Cache files
+.cache/
+.parcel-cache/
+
+# Sass cache
+.sass-cache/
+
+# Local development
+local/
+.local/
+
+# WordPress (if integrated later)
+wp-config.php
+wp-content/uploads/
+
+# Database files
+*.sql
+*.sqlite
+*.db
+
+# Archive files
+*.zip
+*.rar
+*.7z
+*.tar.gz
+
+# Personal notes and todos
+notes.txt
+todo.txt
+TODO.md
+
+# Sensitive data files
+config.json
+secrets.json
+
+# Original data files (keep source data private)
+original_data/
+raw_data/

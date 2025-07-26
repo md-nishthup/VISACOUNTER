@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <header class="header">
@@ -71,6 +72,14 @@
                         </tfoot>
                     </table>
                 </div>
+                
+                <!-- Monthly Chart Section -->
+                <div class="chart-section">
+                    <h4><i class="fas fa-chart-line"></i> Monthly Visa Trend</h4>
+                    <div class="chart-container">
+                        <canvas id="monthlyChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
             </section>
 
             <!-- Country-wise Statistics Section -->
@@ -94,6 +103,14 @@
                         <input type="text" id="countrySearch" placeholder="Search countries..." class="search-input">
                         <i class="fas fa-search search-icon"></i>
                     </div>
+                    
+                    <!-- Country Quota Info - 3 Dynamic Boxes -->
+                    <div id="quota-info" class="quota-info">
+                        <div class="quota-default-message">
+                            <i class="fas fa-search"></i>
+                            <p>Search country to see available quota</p>
+                        </div>
+                    </div>
                 </div>
                 <div class="table-container">
                     <table class="data-table" id="countryTable">
@@ -115,6 +132,26 @@
                             </tr>
                         </tfoot>
                     </table>
+                </div>
+                
+                <!-- Country Chart Section -->
+                <div class="chart-section" id="countryChartSection">
+                    <h4><i class="fas fa-chart-bar"></i> Country Visa Distribution</h4>
+                    <div class="chart-container">
+                        <canvas id="countryChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Course Promotion Section -->
+            <section class="section">
+                <div class="course-promo">
+                    <div class="course-icon">🐍</div>
+                    <div class="course-content">
+                        <h4>Python Mastery for AI Development</h4>
+                        <p>Course starting soon! Join our Facebook group for more info</p>
+                        <a href="https://www.facebook.com/share/g/175MdiQUQB/" target="_blank" class="course-btn">Join Now</a>
+                    </div>
                 </div>
             </section>
 
